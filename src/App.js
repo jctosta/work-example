@@ -2,12 +2,12 @@ import React, { useState, useEffect } from 'react';
 
 // External Libs
 import axios from 'axios';
-import { DateTime } from 'luxon';
 
 import MovieList from './components/MovieList';
 import FilterToolbar from './components/FilterToolbar';
 
-import './App.css';
+import './style/App.scss';
+import ErrorBoundary from './components/ErrorBoundary';
 
 /** @todo: Move to config file */
 const API_BASE_URL = 'https://us-central1-beacon-fe-worksample-api.cloudfunctions.net/app';
@@ -50,7 +50,6 @@ function App() {
   const [movies, setMovies] = useState(loadLocalStorage(MOVIES_STORAGE_KEY));
   const [reviews, setReviews] = useState(loadLocalStorage(REVIEWS_STORAGE_KEY));
   const [filteredMovieList, setFilteredMovieList] = useState(movies);
-  const [filter, setFilter] = useState('');
 
   useEffect(() => {
     if(movies.length === 0) {
@@ -69,7 +68,7 @@ function App() {
         setLocalStorage(REVIEWS_STORAGE_KEY, reviewData);
       })();
     }
-  }, []);
+  }, [movies.length, reviews.length]);
 
   const filterHandler = (value) => {
     setFilteredMovieList(movies.filter(movie => movie.title.toUpperCase().includes(value.toUpperCase())));
@@ -84,9 +83,7 @@ function App() {
       const endOfDecade = new Date(Number.parseInt(value) + 9, 0);
   
       setFilteredMovieList(movies.filter(movie => {
-        const movieDate = new Date(Number.parseInt(movie.year), 0);      
-        console.log(movieDate);
-        
+        const movieDate = new Date(Number.parseInt(movie.year), 0);        
         return (movieDate > selectedDecade && movieDate < endOfDecade);
       }));
     }
@@ -94,12 +91,17 @@ function App() {
   }
 
   return (
-    <div className="App">
-      <h1 className="title">Movies Evan Likes!</h1>
-      <span className="subtitle">Below is a (not) comprehensive list of movies that Evan really likes.</span>
-      <FilterToolbar filter={filter} filterHandler={filterHandler.bind(this)} decadeFilterHandler={decadeFilterHandler.bind(this)} />
-      <MovieList movies={filteredMovieList} reviews={reviews} />
-    </div>
+    <ErrorBoundary>
+      <section className="section">
+        <div className="container">
+          <h1 className="title">Movies Evan Likes!</h1>
+          <p className="subtitle">Below is a (not) comprehensive list of movies that Evan really likes.</p>
+          <FilterToolbar filterHandler={filterHandler.bind(this)} decadeFilterHandler={decadeFilterHandler.bind(this)} />
+          <hr />
+          <MovieList movies={filteredMovieList} reviews={reviews} apiBaseURL={API_BASE_URL} />
+        </div>
+      </section>
+    </ErrorBoundary>
   );
 }
 

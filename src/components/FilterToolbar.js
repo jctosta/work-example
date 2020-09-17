@@ -21,17 +21,35 @@ function FilterToolbar(props) {
     }
 
     return (
-        <div className="filters">
-            <div>
-                <label htmlFor="title-filter">Title Contains: </label>
-                <input id="title-filter" type="search" onChange={handleInputChange.bind(this)} />
+        <div className="container">
+            <div className="field is-horizontal">
+                <div className="field-label is-normal">
+                    <label className="label" htmlFor="title-filter">Title Contains: </label>
+                </div>
+                <div className="field-body">
+                    <div className="field">
+                        <div className="control">
+                            <input className="input" id="title-filter" type="search" onChange={handleInputChange.bind(this)} />
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div>
-                <label htmlFor="decade-filter">Decade: </label>
-                <select id="decade-filter" onChange={handleDecadeFilter.bind(this)}>
-                    <option value="0"></option>
-                    {decades}
-                </select>
+            <div className="field is-horizontal">
+                <div className="field-label is-normal">
+                    <label className="label" htmlFor="decade-filter">Decade: </label>
+                </div>
+                <div className="field-body">
+                    <div className="field">
+                        <div className="control">
+                            <div className="select is-fullwidth">
+                                <select id="decade-filter" onChange={handleDecadeFilter.bind(this)}>
+                                    <option value="0"></option>
+                                    {decades}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     );

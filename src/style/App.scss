@@ -1,0 +1,19 @@
+@charset "utf-8";
+
+// Import a Google Font
+@import url('https://fonts.googleapis.com/css?family=Titillium+Web:400,700');
+
+// Custom colors
+$mblue: #257B9E;
+
+// Update Bulma's global variables
+$family-sans-serif: "Titillium Web", sans-serif;
+$primary: $mblue;
+$link: $mblue;
+$widescreen-enabled: false;
+$fullhd-enabled: false;
+
+// Update some of Bulma's component variables
+$control-border-width: 2px;
+
+@import "~bulma/bulma.sass";

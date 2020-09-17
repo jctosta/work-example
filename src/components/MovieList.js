@@ -11,51 +11,75 @@ const sortMovies = (a, b) => {
 }
 
 function MovieList(props) {
-
-    const [movies, setMovies] = useState(props.movies);
+    
+    const [propMovies, setPropMovies] = useState(props.movies);
+    const [propReviews, setPropReviews] = useState(props.reviews);
+    const [movies, setMovies] = useState({count: 0, list: []});
+    
+    useEffect(() => {
+        setPropMovies(props.movies);
+        setPropReviews(props.reviews);
+    }, [props.movies, props.reviews]);
 
     useEffect(() => {
-        const sortedMovieList = movies.sort(sortMovies);    
+        
+        const generateList = () => {
+            const sortedMovieList = propMovies.sort(sortMovies);  
+        
+            const finalList = sortedMovieList.map(m => {        
+                m.review = propReviews.find(r => m.id === r["movie-id"]).review;
+                m.displayReview = false;
+                return m;
+            });
     
-        setMovies(sortedMovieList.map(m => {        
-            m.review = props.reviews.find(r => m.id === r["movie-id"]).review;
-            m.displayReview = false;
-            return m;
-        }));
+            return finalList;
+        };
 
-        console.log(movies);
+        const movieList = generateList();
 
-    }, movies);
+        setMovies({count: movies.count++, list: movieList});
+
+    }, [propMovies, propReviews, movies.count]);
 
     const toggleReviewVisibility = (index) => {
-        const tempMovies = movies;
+        const tempMovies = movies.list;
         tempMovies[index].displayReview = !tempMovies[index].displayReview;
-        setMovies(tempMovies);
-        console.log(movies);
+        setMovies({count: movies.count++, list: tempMovies});
     }
 
     const displayReview = (movie) => {
-        const imageURL = `https://us-central1-beacon-fe-worksample-api.cloudfunctions.net/app/${movie["cover-url"]}`;
-        return (<div>
-            <img src={imageURL} alt={`${movie.title} Cover Image`} />
-            <span>{movie.review}</span>
-        </div>);
+        const imageURL = `${props.apiBaseURL}/${movie["cover-url"]}`;
+        return (
+            <div className="box my-1">
+                <div className="columns">
+                    <div className="column is-2">
+                        <figure className="image">
+                            <img src={imageURL} alt={`${movie.title} Cover`} />
+                        </figure>
+                    </div>
+                    <div className="column is-10">
+                        <h3>Review</h3>
+                        <p>{movie.review}</p>
+                    </div>
+                </div>
+            </div>
+        );
     }
 
-    const movieList = movies.map((movie, index) => 
-        <li key={index} className="list-item">
-            <div className="movie-title" onClick={() => toggleReviewVisibility(index)}>{Number(movie.score).toLocaleString(undefined, {style: 'percent', minimumFractionDigits:0})} <a href={movie.url}>{movie.title}</a> ({movie.year})</div>
-            <div className="movie-review">{displayReview(movie)}</div>
+    const movieList = movies.list.map((movie, index) => 
+        <li key={index}>
+            <p className="py-1" onClick={() => toggleReviewVisibility(index)}>
+                <strong className="mr-3"><a href={movie.url} target="_blank" rel="noopener noreferrer">{movie.title}</a></strong>
+                <span className="tag is-light is-medium is-light mx-1">{movie.year}</span>
+                <span className="tag is-dark is-medium mx-1">{Number(movie.score).toLocaleString(undefined, {style: 'percent', minimumFractionDigits:0})}</span>
+            </p>
+            {movie.displayReview && displayReview(movie)}
+            <hr />
         </li>
     );
 
 
-    return (
-        <div>
-            <h2>Movie List</h2>
-            <ul>{movieList}</ul>
-        </div>
-    );
+    return (<ul className="content">{movieList}</ul>);
 }
 
 export default MovieList;
